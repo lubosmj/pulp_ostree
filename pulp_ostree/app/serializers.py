@@ -1,6 +1,7 @@
 from gettext import gettext as _
 from tarfile import is_tarfile
 
+from django.urls import resolve
 from rest_framework import serializers
 
 from pulpcore.plugin import serializers as platform
@@ -174,6 +175,37 @@ class OstreeRepositorySerializer(platform.RepositorySerializer):
     class Meta:
         fields = platform.RepositorySerializer.Meta.fields
         model = models.OstreeRepository
+
+
+class OstreeRepositoryAddRemoveContentSerializer(platform.RepositoryAddRemoveContentSerializer):
+    """A Serializer class for modifying a repository from an existing repository."""
+
+    ALLOWED_ADD_REMOVE_CONTENT_UNITS = [
+        models.OstreeCommit, models.OstreeRef, models.OstreeConfig, models.OstreeSummary
+    ]
+
+    def validate(self, data):
+        """TODO."""
+        data = super().validate(data)
+
+        self.validate_units("add_content_units", data)
+        self.validate_units("remove_content_units", data)
+
+        return data
+
+    def validate_units(self, units_type, data):
+        """TODO."""
+        if units_type in data:
+            for unit_href in data[units_type]:
+                if not self.is_in_allowed_content(unit_href):
+                    raise serializers.ValidationError(
+                        _("The unit {} is not allowed to be used in this endpoint".format(unit_href))
+                    )
+
+    def is_in_allowed_content(self, unit_href):
+        """TODO."""
+        unit_model = resolve(unit_href).func.cls.queryset.model
+        return unit_model in self.ALLOWED_ADD_REMOVE_CONTENT_UNITS
 
 
 class OstreeDistributionSerializer(platform.DistributionSerializer):

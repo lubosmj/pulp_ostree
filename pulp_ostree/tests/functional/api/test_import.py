@@ -5,7 +5,7 @@ import subprocess
 import unittest
 
 from pathlib import Path
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin
 
 from pulp_smash import config, api
 from pulp_smash.pulp3.bindings import delete_orphans, monitor_task
@@ -37,7 +37,6 @@ class ImportCommitTestCase(unittest.TestCase):
     def setUpClass(cls):
         """Initialize class-wide variables."""
         cls.cfg = config.get_config()
-        cls.registry_name = urlparse(cls.cfg.get_base_url()).netloc
         cls.client = api.Client(cls.cfg, api.json_handler)
 
         client_api = gen_ostree_client()

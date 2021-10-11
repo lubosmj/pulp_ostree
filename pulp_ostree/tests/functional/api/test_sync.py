@@ -1,9 +1,8 @@
 import shutil
 import unittest
 
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin
 
-from pulp_smash import config
 from pulp_smash.pulp3.bindings import delete_orphans, monitor_task
 from pulp_smash.pulp3.utils import gen_repo, gen_distribution
 
@@ -13,7 +12,6 @@ from pulp_ostree.tests.functional.utils import (
     init_local_repo_with_remote,
     validate_repo_integrity,
 )
-from pulp_ostree.tests.functional.utils import set_up_module as setUpModule  # noqa:F401
 
 from pulpcore.client.pulp_ostree import (
     DistributionsOstreeApi,
@@ -31,9 +29,6 @@ class BasicSyncTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Initialize class-wide variables."""
-        cfg = config.get_config()
-        cls.registry_name = urlparse(cfg.get_base_url()).netloc
-
         client_api = gen_ostree_client()
         cls.repositories_api = RepositoriesOstreeApi(client_api)
         cls.versions_api = RepositoriesOstreeVersionsApi(client_api)
